@@ -17,16 +17,16 @@ jobs:
       run: |
         curl -LSs "https://raw.githubusercontent.com/rifsxd/KernelSU-Next/next/kernel/setup.sh" | bash -
         
-    - name: Setup Clang
+    - name: Setup Clang (Neutrino)
       run: |
         mkdir -p clang
         cd clang
-        wget -q https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/main/clang-r383902b.tar.gz
-        tar -xf clang-r383902b.tar.gz
+        wget -q https://gitlab.com/Neutrino-Project/snapdragon-clang/-/raw/16/neutrino-clang-16.0.6-20231109.tar.zst?inline=false -O clang.tar.zst
+        tar -xf clang.tar.zst
         
-    - name: Setup GCC
+    - name: Setup GCC (AOSP)
       run: |
-        git clone --depth=1 https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9.git gcc
+        git clone --depth=1 https://gitlab.com/Neutrino-Project/gcc-aarch64.git gcc
         
     - name: Configure and build kernel
       working-directory: kernel-source
