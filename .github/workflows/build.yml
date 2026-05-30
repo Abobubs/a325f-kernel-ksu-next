@@ -17,14 +17,14 @@ jobs:
       run: |
         curl -LSs "https://raw.githubusercontent.com/rifsxd/KernelSU-Next/next/kernel/setup.sh" | bash -
         
-    - name: Setup Clang (from AOSP)
+    - name: Setup Clang (Google official)
       run: |
         mkdir -p clang
         cd clang
-        wget -q https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/main/clang-r383902b.tar.gz
-        tar -xf clang-r383902b.tar.gz
+        wget -q https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/tags/android-13.0.0_r105/clang-r450784d.tar.gz
+        tar -xf clang-r450784d.tar.gz
         
-    - name: Setup GCC (from AOSP)
+    - name: Setup GCC (Google official)
       run: |
         git clone --depth=1 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9.git gcc
         
@@ -38,7 +38,8 @@ jobs:
         export CLANG_TRIPLE=aarch64-linux-gnu-
         export LD_LIBRARY_PATH=$GITHUB_WORKSPACE/clang/lib64:$LD_LIBRARY_PATH
         make a32_defconfig
-        make -j$(nproc) -k
+        make -j$(nproc) 2>&1
+        
     - name: Upload kernel image
       uses: actions/upload-artifact@v4
       with:
