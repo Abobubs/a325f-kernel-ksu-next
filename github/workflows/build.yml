@@ -17,18 +17,18 @@ jobs:
       run: |
         curl -LSs "https://raw.githubusercontent.com/rifsxd/KernelSU-Next/next/kernel/setup.sh" | bash -
         
-    - name: Setup Clang (Neutrino)
+    - name: Setup Clang (from AOSP)
       run: |
         mkdir -p clang
         cd clang
-        wget -q https://gitlab.com/Neutrino-Project/snapdragon-clang/-/raw/16/neutrino-clang-16.0.6-20231109.tar.zst?inline=false -O clang.tar.zst
-        tar -xf clang.tar.zst
+        wget -q https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/main/clang-r383902b.tar.gz
+        tar -xf clang-r383902b.tar.gz
         
-    - name: Setup GCC (AOSP)
+    - name: Setup GCC (from AOSP)
       run: |
-        git clone --depth=1 https://gitlab.com/Neutrino-Project/gcc-aarch64.git gcc
+        git clone --depth=1 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9.git gcc
         
-    - name: Configure and build kernel
+    - name: Build kernel
       working-directory: kernel-source
       run: |
         export PATH=$GITHUB_WORKSPACE/clang/bin:$GITHUB_WORKSPACE/gcc/bin:$PATH
@@ -36,9 +36,9 @@ jobs:
         export CROSS_COMPILE=aarch64-linux-android-
         export CC=clang
         export CLANG_TRIPLE=aarch64-linux-gnu-
+        export LD_LIBRARY_PATH=$GITHUB_WORKSPACE/clang/lib64:$LD_LIBRARY_PATH
         make a32_defconfig
-        make -j$(nproc)
-        
+        make -j$(nproc) -k
     - name: Upload kernel image
       uses: actions/upload-artifact@v4
       with:
