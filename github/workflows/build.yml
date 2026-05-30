@@ -1,4 +1,4 @@
-name: Build A325F Kernel with KernelSU-Next
+name: Build Kernel with KernelSU-Next
 
 on:
   workflow_dispatch:
@@ -17,23 +17,25 @@ jobs:
       run: |
         curl -LSs "https://raw.githubusercontent.com/rifsxd/KernelSU-Next/next/kernel/setup.sh" | bash -
         
-    - name: Setup toolchain
+    - name: Setup Clang
       run: |
-        mkdir -p toolchain
-        cd toolchain
+        mkdir -p clang
+        cd clang
         wget -q https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/main/clang-r383902b.tar.gz
         tar -xf clang-r383902b.tar.gz
+        
+    - name: Setup GCC
+      run: |
         git clone --depth=1 https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9.git gcc
         
-    - name: Build kernel
+    - name: Configure and build kernel
       working-directory: kernel-source
       run: |
-        export PATH=$GITHUB_WORKSPACE/toolchain/bin:$GITHUB_WORKSPACE/toolchain/gcc/bin:$PATH
+        export PATH=$GITHUB_WORKSPACE/clang/bin:$GITHUB_WORKSPACE/gcc/bin:$PATH
         export ARCH=arm64
         export CROSS_COMPILE=aarch64-linux-android-
         export CC=clang
         export CLANG_TRIPLE=aarch64-linux-gnu-
-        export LD_LIBRARY_PATH=$GITHUB_WORKSPACE/toolchain/lib64:$LD_LIBRARY_PATH
         make a32_defconfig
         make -j$(nproc)
         
